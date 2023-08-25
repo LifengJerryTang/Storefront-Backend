@@ -9,7 +9,7 @@
     "test": "jasmine-ts",
     "tsc": "tsc"
   },
-  "author": "Udacity",
+  "author": "Lifeng Tang",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
