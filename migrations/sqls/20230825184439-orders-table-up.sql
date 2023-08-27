@@ -1,1 +1,7 @@
-/* Replace with your SQL commands */
+CREATE TYPE ORDER_STATUS AS ENUM ('active', 'complete');
+
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    order_status ORDER_STATUS NOT NULL
+)
