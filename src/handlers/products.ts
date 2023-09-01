@@ -17,6 +17,11 @@ const show = async (req: Request, res: Response) => {
 }
 
 const create = async (req: Request, res: Response) => {
+
+    if (!req.body.name || !req.body.price || !req.body.category) {
+        res.status(400).send('Missing one or more fields for your new product!');
+    }
+
     const product: Product = {
         name: req.body.name,
         price: +req.body.price,
@@ -30,6 +35,7 @@ const create = async (req: Request, res: Response) => {
 }
 
 const productsByCategory = async (req: Request, res: Response) => {
+
     const products = await store.productsByCategory(req.params.category);
 
     res.status(200).json(products);

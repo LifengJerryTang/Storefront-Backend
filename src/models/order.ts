@@ -1,11 +1,13 @@
 import client from "../database";
+import {OrderProducts} from "./order-products";
 
 export type Order = {
     id?: number,
-    products: Array<{number: number}>, // key: product id; value: quantity
-    userId: number,
-    status: string;
+    products?: OrderProducts[],
+    user_id: number,
+    order_status: string;
 }
+
 
 export class OrderStore {
     async index(userId: number): Promise<Order[]> {
@@ -20,6 +22,20 @@ export class OrderStore {
             return result.rows;
         } catch (err) {
             throw new Error(`Could not get all orders: ${err}`);
+        }
+    }
+
+    async create(userId: number, orderStatus: string): Promise<Order> {
+        try {
+            const conn = await client.connect();
+            const sql = 'INSERT INTO orders (user_id, order_status) VALUES ($1, $2)';
+
+            const result = await conn.query(sql, [userId, orderStatus]);
+            conn.release();
+
+            return result.rows[0];
+        } catch (err) {
+            throw new Error(`Could not create order: ${err}`);
         }
     }
 

@@ -29,8 +29,7 @@ const create = async (req: Request, res: Response) => {
 
     try {
         const newUser = await store.create(user);
-
-        res.json(newUser)
+        res.status(200).json(newUser)
 
     } catch(err) {
         res.status(400).json(`Unable to create user with username of ${user.username}: ${err}`)
@@ -64,7 +63,7 @@ const authenticate = async (req: Request, res: Response) => {
 const userRoutes = (app: express.Application) => {
     app.get('/users', verifyToken, index)
     app.get('/users/{:id}', verifyToken, show)
-    app.post('/users', verifyToken, create)
+    app.post('/users', create)
     app.post('/users/authenticate', authenticate);
 }
 
