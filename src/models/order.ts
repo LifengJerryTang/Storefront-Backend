@@ -28,12 +28,14 @@ export class OrderStore {
     async create(userId: number, orderStatus: string): Promise<Order> {
         try {
             const conn = await client.connect();
-            const sql = 'INSERT INTO orders (user_id, order_status) VALUES ($1, $2)';
+            const sql =
+                'INSERT INTO orders (user_id, order_status) VALUES ($1, $2) RETURNING *';
 
             const result = await conn.query(sql, [userId, orderStatus]);
+            const order = result.rows[0]
             conn.release();
 
-            return result.rows[0];
+            return order;
         } catch (err) {
             throw new Error(`Could not create order: ${err}`);
         }

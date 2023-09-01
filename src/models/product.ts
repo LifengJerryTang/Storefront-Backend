@@ -57,6 +57,7 @@ export class ProductStore {
     }
 
     async productsByCategory(category: string): Promise<Product[]> {
+        console.log(category)
         try {
             const sql = 'SELECT * FROM products WHERE category=($1)';
             const conn = await client.connect();
@@ -71,24 +72,4 @@ export class ProductStore {
         }
     }
 
-    async topFiveProducts(): Promise<Product[]> {
-        try {
-            const sql = `SELECT id, name, price, category, SUM(quantity) as sum_quantity
-                                                        FROM products INNER JOIN product_orders 
-                                                        ON products.id = product_orders.product_id
-                                                        GROUP BY id
-                                                        ORDER BY sum_quantity DESC LIMIT 5`;
-
-            const conn = await client.connect();
-            const result = await conn.query(sql);
-
-            const products = result.rows;
-            conn.release();
-
-            return products;
-
-        } catch (err) {
-            throw new Error(`Unable to get the top 5 products: ${err}`);
-        }
-    }
 }

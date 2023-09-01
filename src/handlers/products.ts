@@ -18,8 +18,11 @@ const show = async (req: Request, res: Response) => {
 
 const create = async (req: Request, res: Response) => {
 
+    console.log(req.body)
+
     if (!req.body.name || !req.body.price || !req.body.category) {
         res.status(400).send('Missing one or more fields for your new product!');
+        return;
     }
 
     const product: Product = {
@@ -41,18 +44,12 @@ const productsByCategory = async (req: Request, res: Response) => {
     res.status(200).json(products);
 }
 
-const topFiveProducts = async (req: Request, res: Response) => {
-    const topFiveProducts = await store.topFiveProducts();
-
-    res.status(200).json(topFiveProducts);
-}
 
 const productRoutes = (app: express.Application) => {
     app.get('/products', index)
-    app.get('/products/{:id}', show)
+    app.get('/products/:id', show)
     app.post('/products', verifyToken, create)
-    app.get('/products/{:category}', productsByCategory)
-    app.get('/products/top-5', topFiveProducts)
+    app.get('/products/category/:category', productsByCategory)
 }
 
 export default productRoutes;

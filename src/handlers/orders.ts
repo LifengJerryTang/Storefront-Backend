@@ -34,7 +34,7 @@ const create = async (req: Request, res: Response) => {
     const order = await orderStore.create(+req.body.user_id, req.body.order_status);
 
     for (let orderProducts of req.body.products) {
-        await orderProductStore.create(+orderProducts.order_id, +orderProducts.product_id, +orderProducts.quantity);
+        await orderProductStore.create(order.id as number, +orderProducts.product_id, +orderProducts.quantity);
     }
 
 
@@ -43,10 +43,10 @@ const create = async (req: Request, res: Response) => {
 }
 
 
-const completedOrders = async (req: Request, res: Response)=> {
+const ordersByStatus = async (req: Request, res: Response)=> {
     const userId = +req.params.userId;
 
-    const orders = await orderStore.ordersByStatus(userId, 'completed');
+    const orders = await orderStore.ordersByStatus(userId, req.params.status);
     const returnOrders: Order[] = []
 
     for (let order of orders) {
@@ -63,9 +63,9 @@ const completedOrders = async (req: Request, res: Response)=> {
 }
 
 const orderRoutes = (app: express.Application) => {
-    app.get('/orders/{:userId}', verifyToken, index)
-    app.post('/orders/{:userId}', verifyToken, create)
-    app.get('/orders/:userId/completed', verifyToken, completedOrders)
+    app.get('/orders/:userId', verifyToken, index)
+    app.post('/orders/:userId', verifyToken, create)
+    app.get('/orders/:userId/status/:status', verifyToken, ordersByStatus)
 }
 
 export default orderRoutes;
