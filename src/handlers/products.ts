@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import {Product, ProductStore} from "../models/product";
+import {verifyToken} from "../middlewares/verify-token";
 
 const store = new ProductStore();
 
@@ -43,7 +44,7 @@ const topFiveProducts = async (req: Request, res: Response) => {
 const productRoutes = (app: express.Application) => {
     app.get('/products', index)
     app.get('/products/{:id}', show)
-    app.post('/products', create)
+    app.post('/products', verifyToken, create)
     app.get('/products/{:category}', productsByCategory)
     app.get('/products/top-5', topFiveProducts)
 }

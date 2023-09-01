@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express'
 import {Order, OrderStore} from "../models/order";
+import {verify} from "jsonwebtoken";
+import {verifyToken} from "../middlewares/verify-token";
 
 const store = new OrderStore();
 
@@ -20,8 +22,8 @@ const completedOrders = async (req: Request, res: Response)=> {
 }
 
 const orderRoutes = (app: express.Application) => {
-    app.get('/orders/{:userId}', index)
-    app.get('/orders/:userId/completed', completedOrders)
+    app.get('/orders/{:userId}', verifyToken, index)
+    app.get('/orders/:userId/completed', verifyToken, completedOrders)
 }
 
 export default orderRoutes;
