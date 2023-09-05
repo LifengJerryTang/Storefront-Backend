@@ -14,7 +14,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 #### Users
 - Index [token required] '/users' [GET]
 - Show [token required] '/users/:id' [GET]
-- Create [token required] '/users' [POST]
+- Create '/users' [POST]
 
 #### Orders
 - Current Order by user (args: user id)[token required]: '/orders/:userId' [GET]
