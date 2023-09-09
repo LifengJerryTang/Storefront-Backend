@@ -18,8 +18,6 @@ const show = async (req: Request, res: Response) => {
 
 const create = async (req: Request, res: Response) => {
 
-    console.log(req.body)
-
     if (!req.body.name || !req.body.price || !req.body.category) {
         res.status(400).send('Missing one or more fields for your new product!');
         return;

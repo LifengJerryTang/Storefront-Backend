@@ -94,4 +94,16 @@ describe('Order Model Tests', () => {
             }
         ])
     });
+
+
+    afterAll(async () => {
+        const conn = await client.connect();
+        const deleteQuery = `DELETE FROM orders`;
+
+        await conn.query(deleteQuery);
+
+        conn.release();
+
+    })
+
 })

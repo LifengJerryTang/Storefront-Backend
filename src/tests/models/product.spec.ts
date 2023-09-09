@@ -96,5 +96,14 @@ describe('Product Model Tests', () => {
         })
     });
 
+    afterAll(async () => {
+        const conn = await client.connect();
+        const deleteQuery = `DELETE FROM products`;
+
+        await conn.query(deleteQuery);
+
+        conn.release();
+
+    })
 
 })
