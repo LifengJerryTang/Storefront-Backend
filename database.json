@@ -5,14 +5,16 @@
     "port": 5432,
     "database": "storefront",
     "user": "storefront_user",
-    "password": "12345"
+    "password": "12345",
+    "schema": "public"
   },
   "test": {
     "driver": "pg",
     "host": "127.0.0.1",
-    "port": 5433,
+    "port": 5432,
     "database": "storefront_test",
-    "user": "storefront_test_user",
-    "password": "12345"
+    "user": "storefront_user",
+    "password": "12345",
+    "schema": "public"
   }
 }

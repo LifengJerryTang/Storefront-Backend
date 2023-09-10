@@ -3,13 +3,16 @@ import {Order} from '../../models/order';
 import supertest from 'supertest';
 import client from "../../database";
 import jwt, {Secret} from "jsonwebtoken";
+import {UserStore} from "../../models/user";
 
 const request = supertest(app);
 const SECRET = process.env.ACCESS_TOKEN_SECRET as Secret;
 describe('Orders Handler Tests', () => {
 
+    const userStore = new UserStore();
+
     const testUser = {
-        id: 1,
+        id: -1,
         username: 'username2',
         firstname: 'Jake',
         lastname: 'Snow',
@@ -18,14 +21,17 @@ describe('Orders Handler Tests', () => {
 
     const testOrder = {
         products: [],
-        user_id: 1,
+        user_id: -1,
         order_status: 'active'
     }
 
     let testToken = '';
 
     beforeAll(async () => {
-        testToken = jwt.sign({ testUser }, SECRET);
+        const user = await userStore.create(testUser);
+        testUser.id = user.id!;
+        testOrder.user_id = user.id!;
+        testToken = jwt.sign({ user }, SECRET);
     })
 
     it('should reach the create endpoint', async () => {
@@ -63,8 +69,8 @@ describe('Orders Handler Tests', () => {
 
     afterAll(async () => {
         const conn = await client.connect();
-        const deleteOrdersQuery = `DELETE FROM orders`;
-        await conn.query(deleteOrdersQuery)
+        await conn.query(`DELETE FROM orders`);
+        await conn.query(`DELETE FROM users`)
 
         conn.release();
 

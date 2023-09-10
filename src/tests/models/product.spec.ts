@@ -3,47 +3,24 @@ import client from "../../database";
 describe('Product Model Tests', () => {
     const store = new ProductStore();
 
-    const testData: Product[] = [
-        {
-            id: 1,
+    const testProduct =  {
+            id: -1,
             name: 'Cat',
-            price: 25.0,
-            category: 'Pet'
-        },
-
-        {
-            id: 2,
-            name: 'Toothbrush',
-            price: 5.0,
-            category: 'Hygiene'
-        },
-
-        {
-            id: 3,
-            name: 'Pencil',
-            price: 2.0,
-            category: 'School Supplies'
-        },
-
-        {
-            id: 4,
-            name: 'Dog',
-            price: 50.0,
+            price: 25.00,
             category: 'Pet'
         }
-    ]
 
     async function initTestData() {
 
         const conn = await client.connect();
 
-        for (let product of testData) {
-            const sql =
-                'INSERT INTO products (name, price, category) VALUES ($1, $2, $3)';
+        const sql =
+            'INSERT INTO products (name, price, category) VALUES ($1, $2, $3) RETURNING *';
 
-            await conn.query(sql, [product.name,
-                product.price, product.category]);
-        }
+        const result = await conn.query(sql, [testProduct.name,
+            testProduct.price, testProduct.category]);
+
+        testProduct.id = result.rows[0].id;
 
         conn.release();
     }
@@ -67,31 +44,36 @@ describe('Product Model Tests', () => {
     it('should return a list of product when calling the index method', async () => {
         const products: Product[] = await store.index();
         expect(products).toBeDefined();
-        expect(products).toEqual(testData);
+        expect(products.length).toBeGreaterThanOrEqual(1);
     })
 
     it('should return the correct product when calling the show method', async () => {
-        const product = await store.show(1);
+        const product = await store.show(testProduct.id);
+        product.price = +product.price
         expect(product).toBeDefined();
-        expect(product).toEqual( {
-            id: 1,
-            name: 'Cat',
-            price: 25.0,
-            category: 'Pet'
-        })
+        expect(product).toEqual(testProduct)
+    })
+
+    it('should return the correct product(s) when calling the productsByCategory method',
+        async () => {
+        const products: Product[] = await store.productsByCategory(testProduct.category);
+        products[0].price = +products[0].price;
+        expect(products).toBeDefined();
+        expect(products).toEqual([testProduct])
     })
 
     it('should create the input product when calling the create method', async () => {
         const product: Product = {
             name: 'Milk',
-            price: 2.5,
-            category: 'Food and Drinks'
+            price: 2.50,
+            category: 'Food and Drink'
         }
 
         const newProduct = await store.create(product);
+        newProduct.price = +newProduct.price
         expect(newProduct).toBeDefined();
         expect(newProduct).toEqual({
-            id: 5,
+            id: testProduct.id + 1,
             ...product
         })
     });

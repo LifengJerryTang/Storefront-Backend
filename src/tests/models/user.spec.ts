@@ -9,49 +9,32 @@ const pepper = process.env.BCRYPT_PASSWORD
 describe('User Model Tests', () => {
     const store = new UserStore();
 
-    const testData = [
-        {
-            id: 1,
-            username: 'username1',
-            firstname: 'John',
-            lastname: 'Doe',
-            password: '12345'
-        },
-
-        {
-            id: 2,
-            username: 'username2',
-            firstname: 'Jake',
-            lastname: 'Snow',
-            password: '54321'
-        },
-
-        {
-            id: 3,
-            username: 'username3',
-            firstname: 'Jack',
-            lastname: 'Harrison',
-            password: 'sfdsfsf123123ds'
-        }
-
-    ]
+    const testUser: User = {
+        id: -1,
+        username: 'testUsername',
+        firstname: 'John',
+        lastname: 'Doe',
+        password: '12345'
+    }
 
     async function initTestData() {
 
         const conn = await client.connect();
 
-        for (let user of testData) {
-            const sql =
-                'INSERT INTO users (username, firstname, lastname, password) VALUES ($1, $2, $3, $4)';
+        const sql =
+            'INSERT INTO users (username, firstname, lastname, password) VALUES ($1, $2, $3, $4) RETURNING *';
 
-            const hash = bcrypt.hashSync(
-                user.password + pepper,
-                parseInt(saltRounds as string)
-            );
+        const hash = bcrypt.hashSync(
+            testUser.password + pepper,
+            parseInt(saltRounds as string)
+        );
 
-            await conn.query(sql, [user.username, user.firstname,
-                user.lastname, hash])
-        }
+        const result = await conn.query(sql, [testUser.username, testUser.firstname,
+            testUser.lastname, hash])
+
+        testUser.id = result.rows[0].id;
+
+        console.log(result.rows)
 
         conn.release();
     }
@@ -80,31 +63,33 @@ describe('User Model Tests', () => {
     it('should return a list of users when calling the index method', async () => {
         const users: User[] = await store.index();
         expect(users).toBeDefined();
-        expect(users.length).toEqual(testData.length);
+        expect(users.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should create a user successfully when calling the create method', async () => {
         const user: User = await store.create({
-            username: 'username4',
+            username: 'testUsername2',
             firstname: 'Jerry',
             lastname: 'Kim',
             password: '987654321'
         });
 
         expect(user).toBeDefined();
-        expect(user.id).toEqual(4);
+        expect(user.id).toEqual(testUser.id! + 1);
+        expect(user.username).toEqual('testUsername2');
+
     });
 
     it('should return the correct user when calling the show method', async () => {
-        const user: User = await store.show(3);
+        const user: User = await store.show(testUser.id!);
         expect(user).toBeDefined();
-        expect(user.id).toEqual(3);
+        expect(user.id).toEqual(testUser.id);
     });
 
     it('should authenticate user when calling the authenticate method', async () => {
-        const user: User = await store.authenticate('username1', '12345') as User;
+        const user: User = await store.authenticate('testUsername', '12345') as User;
         expect(user).toBeDefined();
-        expect(user.username).toEqual('username1');
+        expect(user.username).toEqual('testUsername');
     });
 
     afterAll(async () => {

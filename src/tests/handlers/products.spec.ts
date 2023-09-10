@@ -2,6 +2,7 @@ import supertest from "supertest";
 import app from "../../server";
 import {Product} from "../../models/product";
 import jwt, {Secret} from "jsonwebtoken";
+import client from "../../database";
 
 const request = supertest(app);
 const SECRET = process.env.ACCESS_TOKEN_SECRET as Secret;
@@ -58,11 +59,18 @@ describe('Product Handler Tests', () => {
 
     it('should reach the productsByCategory endpoint', async () => {
         const res = await request.get('/products/category/test');
-
         const products: Product[] = res.body;
 
         expect(products).toBeDefined();
         expect(res.status).toBe(200);
-    })
+    });
+
+    afterAll(async () => {
+        const conn = await client.connect();
+
+        await conn.query(`DELETE FROM products`);
+        conn.release();
+
+    });
 
 })
