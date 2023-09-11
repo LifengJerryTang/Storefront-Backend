@@ -17,7 +17,7 @@ const address = `127.0.0.1:${port}`;
 app.use(bodyParser.json())
 
 app.get('/', function (req: Request, res: Response) {
-    res.send('Hello World!')
+    res.send('Server working...')
 })
 
 app.listen(3000, function () {
