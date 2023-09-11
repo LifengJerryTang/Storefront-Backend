@@ -8,15 +8,28 @@ const SECRET = process.env.ACCESS_TOKEN_SECRET as Secret;
 const store = new UserStore();
 
 const index = async (req: Request, res: Response) => {
-    const users = await store.index();
 
-    res.status(200).json(users);
+    try {
+        const users = await store.index();
+
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(400).render('error', { error: `Failed to get all of the users: ${err}` });
+    }
+
 }
 
 const show = async (req: Request, res: Response) => {
-    const user = await store.show(+req.params.id);
 
-    res.status(200).json(user);
+    try {
+        const user = await store.show(+req.params.id);
+
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(400).render('error',
+            { error: `Failed to get user with id of ${req.params.id}: ${err}` });
+    }
+
 }
 
 const create = async (req: Request, res: Response) => {

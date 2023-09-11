@@ -5,15 +5,28 @@ import {verifyToken} from "../middlewares/verify-token";
 const store = new ProductStore();
 
 const index = async (_req: Request, res: Response) => {
-    const products = await store.index();
 
-    res.status(200).json(products);
+    try {
+        const products = await store.index();
+
+        res.status(200).json(products);
+    } catch (err) {
+        res.status(400).render('error', { error: `Failed to get all of the products: ${err}` })
+    }
+
 }
 
 const show = async (req: Request, res: Response) => {
-    const product = await store.show(+req.params.id);
 
-    res.status(200).json(product);
+    try {
+        const product = await store.show(+req.params.id);
+
+        res.status(200).json(product);
+    } catch (err) {
+        res.status(400).render('error',
+            { error: `Failed to get the product with id of ${req.params.id} : ${err}` })
+    }
+
 }
 
 const create = async (req: Request, res: Response) => {
@@ -29,17 +42,28 @@ const create = async (req: Request, res: Response) => {
         category: req.body.category
     };
 
-    const newProduct = await store.create(product);
+    try {
+        const newProduct = await store.create(product);
 
-    res.status(200).json(newProduct);
+        res.status(200).json(newProduct);
+    } catch (err) {
+        res.status(400).render('error',
+            { error: `Failed to create product: ${err}` })
+    }
 
 }
 
 const productsByCategory = async (req: Request, res: Response) => {
 
-    const products = await store.productsByCategory(req.params.category);
+    try {
+        const products = await store.productsByCategory(req.params.category);
 
-    res.status(200).json(products);
+        res.status(200).json(products);
+    } catch (err) {
+        res.status(400).render('error',
+            { error: `Failed to get the products in the ${req.params.category} category : ${err}` })
+    }
+
 }
 
 

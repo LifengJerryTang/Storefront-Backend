@@ -8,20 +8,24 @@ const orderProductStore = new OrderProductStore()
 
 const index = async (req: Request, res: Response) => {
 
-    const orders = await orderStore.index(+req.params.userId);
-    const returnOrders: Order[] = []
+    try {
+        const orders = await orderStore.index(+req.params.userId);
+        const returnOrders: Order[] = []
 
-    for (let order of orders) {
-        let orderProducts = await orderProductStore.index(order.id as number);
+        for (let order of orders) {
+            let orderProducts = await orderProductStore.index(order.id as number);
 
-        returnOrders.push({
-            ...order,
-            products: orderProducts
-        })
+            returnOrders.push({
+                ...order,
+                products: orderProducts
+            })
 
+        }
+
+        res.status(200).json(returnOrders);
+    } catch (err) {
+        res.status(400).render('error', { error: `Failed to grab all of the orders: ${err}` })
     }
-
-    res.status(200).json(returnOrders);
 
 }
 
@@ -31,35 +35,46 @@ const create = async (req: Request, res: Response) => {
         res.status(400).send('Missing one or more fields in your new order object!');
     }
 
-    const order = await orderStore.create(+req.body.user_id, req.body.order_status);
+    try {
+        const order = await orderStore.create(+req.body.user_id, req.body.order_status);
 
-    for (let orderProducts of req.body.products) {
-        await orderProductStore.create(order.id as number, +orderProducts.product_id, +orderProducts.quantity);
+        for (let orderProducts of req.body.products) {
+            await orderProductStore.create(order.id as number, +orderProducts.product_id, +orderProducts.quantity);
+        }
+
+
+        res.status(200).json(order);
+    } catch (err) {
+        res.status(400).render('error', { error: `Failed to create order: ${err}` })
     }
-
-
-    res.status(200).json(order);
 
 }
 
 
 const ordersByStatus = async (req: Request, res: Response)=> {
+
     const userId = +req.params.userId;
 
-    const orders = await orderStore.ordersByStatus(userId, req.params.status);
-    const returnOrders: Order[] = []
+    try {
+        const orders = await orderStore.ordersByStatus(userId, req.params.status);
+        const returnOrders: Order[] = []
 
-    for (let order of orders) {
-        let orderProducts = await orderProductStore.index(order.id as number);
+        for (let order of orders) {
+            let orderProducts = await orderProductStore.index(order.id as number);
 
-        returnOrders.push({
-            ...order,
-            products: orderProducts
-        })
+            returnOrders.push({
+                ...order,
+                products: orderProducts
+            })
 
+        }
+
+        res.status(200).json(returnOrders);
+    } catch (err) {
+        res.status(400).render('error',
+            { error: `Failed to get orders with status of ${req.params.status}: ${err}` })
     }
 
-    res.status(200).json(returnOrders);
 }
 
 const orderRoutes = (app: express.Application) => {

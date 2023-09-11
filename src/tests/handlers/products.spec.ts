@@ -69,6 +69,8 @@ describe('Product Handler Tests', () => {
         const conn = await client.connect();
 
         await conn.query(`DELETE FROM products`);
+        await conn.query(`DELETE FROM users`);
+
         conn.release();
 
     });

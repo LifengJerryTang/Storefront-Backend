@@ -27,16 +27,63 @@ These are the notes from a meeting with the frontend developer that describe wha
 - price
 - [OPTIONAL] category
 
+```
+products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  price NUMERIC(9,2) NOT NULL,
+  category VARCHAR NOT NULL
+)
+```
+
 #### User
 - id
 - firstName
 - lastName
 - password
 
+```
+Schema:
+
+users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(45) UNIQUE NOT NULL,
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
+    password VARCHAR NOT NULL
+)
+```
+
 #### Orders
 - id
-- id of each product in the order
-- quantity of each product in the order
+- list of Order Products
 - user_id
 - status of order (active or complete)
+
+```
+Schema:
+
+orders (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    order_status ORDER_STATUS NOT NULL
+)
+
+ORDER_STATUS AS ENUM ('active', 'complete');
+```
+
+#### Order Products
+- the id of the order 
+- the id of the product
+- quantity
+
+```
+Schema:
+
+order_products (
+    order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL
+)
+```
 
